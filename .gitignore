@@ -1,0 +1,7 @@
+.venv
+.idea
+__pycache__
+/awg0.conf
+/tg_config.json
+/config.json
+/user_config_awg_preset.pattern
