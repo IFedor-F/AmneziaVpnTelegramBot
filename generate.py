@@ -29,6 +29,7 @@ def get_next_ip() -> str:
 def add_user(comment):
     next_ip = get_next_ip()
     private_key, public_key = subprocess.run([sys.executable, 'wg_keygen.py'], stdout=subprocess.PIPE, text=True).stdout.split("\n")
-    data = fill_pattern(Config.user_config_pattern, {"private_key": private_key, "client_local_ip":next_ip})
+    data = fill_pattern(Config.user_config_pattern, {"private_key": private_key, "client_local_ip": next_ip})
     Config.awg_config.append_user(comment, PublicKey=public_key, AllowedIPs=next_ip)
+    subprocess.run(Config.restart_command, shell=True, capture_output=True, text=True)
     return data
