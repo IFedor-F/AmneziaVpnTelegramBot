@@ -36,7 +36,8 @@ class AWGConfig:
 
     def append_user(self, comment, **keys):
         with open(self.config_path, "a", encoding="UTF-8") as file:
-            file.write(f"\n# {comment}\n[Peer]\n{'\n'.join(f"{key} = {value}" for key, value in keys.items())}\n")
+            formatted_keys = '\n'.join(f'{key} = {value}' for key, value in keys.items())
+            file.write(f"\n# {comment}\n[Peer]\n{formatted_keys}\n")
         self.parse_conf()
 
     def get_allowed_ips(self):
