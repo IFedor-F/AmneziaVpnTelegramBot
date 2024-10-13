@@ -2,6 +2,9 @@
 .idea
 __pycache__
 /awg0.conf
+/awg1.conf
 /tg_config.json
 /config.json
 /user_config_awg_preset.pattern
+/user_config_awg_patterns/awg0.pattern
+/user_config_awg_patterns/awg1.pattern

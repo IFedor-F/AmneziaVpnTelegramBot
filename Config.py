@@ -47,13 +47,25 @@ class AWGConfig:
 
 
 class Config:
-    with open("config.json", "r", encoding="UTF-8") as file:
-        config = json.load(file)
-    restart_command: str = config.get("restart_command")
-    path_to_awg_config: str = config.get("path_to_awg_config")
-    awg_config: AWGConfig = AWGConfig(path_to_awg_config)
-    with open("user_config_awg_preset.pattern", encoding="UTF-8") as file:
-        user_config_pattern: str = file.read()
+    def __init__(self, name: str, config: dict):
+        self.restart_command: str = config.get("restart_command")
+        self.path_to_awg_config: str = config.get("path_to_config")
+        self.awg_config: AWGConfig = AWGConfig(self.path_to_awg_config)
+        with open(f"user_config_awg_patterns/{name}.pattern", encoding="UTF-8") as file:
+            self.user_config_pattern: str = file.read()
+
+
+class ConfigListMeta(type):
+    _configs: dict
+
+    def __getitem__(cls, key) -> Config:
+        return cls._configs.get(key, None)
+
+
+class ConfigList(metaclass=ConfigListMeta):
+    with open("config.json") as f:
+        config = json.load(f)
+    _configs: dict[str, Config] = {name: Config(name, data) for name, data in config.items()}
 
 
 class TgConfig:

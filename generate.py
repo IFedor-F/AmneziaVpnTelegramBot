@@ -1,10 +1,9 @@
+import ipaddress
 import re
 import subprocess
 import sys
 
-from Config import Config
-
-local_ip_pattern = re.compile(r"192\.168\.12\.(?P<n>\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b)/32")
+from Config import ConfigList
 
 
 def fill_pattern(text: str, values: dict[str, str]) -> str:
@@ -17,19 +16,20 @@ def fill_pattern(text: str, values: dict[str, str]) -> str:
     return re.sub(pattern, replace_pattern, text)
 
 
-def get_next_ip() -> str:
-    ip_list = map(lambda i: re.match(local_ip_pattern, i), Config.awg_config.get_allowed_ips())
-    ip_list = map(lambda i: int(i.group('n')), filter(lambda i: i, ip_list))
-    next_ip = max(ip_list) + 1
-    if next_ip > 255:
-        raise AttributeError("Max limit Ip")
-    return f"192.168.12.{next_ip}/32"
+def get_next_ip(config_name):
+    ip_addresses = [ipaddress.ip_network(ip, strict=False).network_address
+                    for ip in ConfigList[config_name].awg_config.get_allowed_ips()]
+    if not ip_addresses:
+        return "192.168.12.1/32"
+    return f"{max(ip_addresses) + 1}/32"
 
 
-def add_user(comment):
-    next_ip = get_next_ip()
-    private_key, public_key = subprocess.run([sys.executable, 'wg_keygen.py'], stdout=subprocess.PIPE, text=True).stdout.split("\n")
-    data = fill_pattern(Config.user_config_pattern, {"private_key": private_key, "client_local_ip": next_ip})
-    Config.awg_config.append_user(comment, PublicKey=public_key, AllowedIPs=next_ip)
-    subprocess.run(Config.restart_command, shell=True, capture_output=True, text=True)
+def add_user(config_name, comment):
+    if ConfigList[config_name] is None:
+        raise KeyError(f"Config {config_name} was not found.")
+    next_ip = get_next_ip(config_name)
+    private_key, public_key = subprocess.run([sys.executable, 'wg_keygen.py'], stdout=subprocess.PIPE, text=True).stdout.split()
+    data = fill_pattern(ConfigList[config_name].user_config_pattern, {"private_key": private_key, "client_local_ip": next_ip})
+    ConfigList[config_name].awg_config.append_user(comment, PublicKey=public_key, AllowedIPs=next_ip)
+    subprocess.run(ConfigList[config_name].restart_command, shell=True, capture_output=True, text=True)
     return data
