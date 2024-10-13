@@ -7,8 +7,7 @@ import telebot
 import generate
 from Config import TgConfig
 
-API_TOKEN = os.getenv('TELEGRAM_FRACTAL_API_TOKEN')
-bot = telebot.TeleBot(API_TOKEN)
+bot = telebot.TeleBot(TgConfig.API_TOKEN)
 
 
 @bot.message_handler(commands=['generate'])

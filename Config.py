@@ -1,4 +1,5 @@
 import json
+import os
 
 
 class AWGConfig:
@@ -72,3 +73,4 @@ class TgConfig:
     with open("tg_config.json", "r", encoding="UTF-8") as file:
         config = json.load(file)
     admin_ids: list[int] = config.get("admin_ids")
+    API_TOKEN: str = os.getenv(config.get("API_TOKEN_ENV_NAME"))
