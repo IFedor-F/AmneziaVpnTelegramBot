@@ -32,6 +32,7 @@ class AWGConfig:
         self.config = config
 
     def get(self):
+        self.parse_conf()
         return self.config
 
     def append_user(self, comment, **keys):
@@ -41,6 +42,7 @@ class AWGConfig:
         self.parse_conf()
 
     def get_allowed_ips(self):
+        self.parse_conf()
         return [peer["AllowedIPs"] for peer in self.config if peer["section"] == "Peer"]
 
 
