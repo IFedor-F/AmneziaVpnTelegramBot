@@ -28,7 +28,7 @@ def add_user(config_name, comment):
     if ConfigList[config_name] is None:
         raise KeyError(f"Config {config_name} was not found.")
     next_ip = get_next_ip(config_name)
-    private_key, public_key = subprocess.run([sys.executable, 'wg_keygen.py'], stdout=subprocess.PIPE, text=True).stdout.split()
+    private_key, public_key = subprocess.run([sys.executable, 'awg_keygen.py'], stdout=subprocess.PIPE, text=True).stdout.split()
     data = fill_pattern(ConfigList[config_name].user_config_pattern, {"private_key": private_key, "client_local_ip": next_ip})
     ConfigList[config_name].awg_config.append_user(comment, PublicKey=public_key, AllowedIPs=next_ip)
     subprocess.run(ConfigList[config_name].restart_command, shell=True, capture_output=True, text=True)
