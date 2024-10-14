@@ -17,11 +17,20 @@ def fill_pattern(text: str, values: dict[str, str]) -> str:
 
 
 def get_next_ip(config_name):
-    ip_addresses = [ipaddress.ip_network(ip, strict=False).network_address
+    ip_addresses = [ipaddress.ip_network(ip, strict=False)
                     for ip in ConfigList[config_name].awg_config.get_allowed_ips()]
+
     if not ip_addresses:
         raise ValueError("No IP addresses configured")
-    return f"{max(ip_addresses) + 1}/32"
+    max_ip = None
+    for net in ip_addresses:
+        if isinstance(net, ipaddress.IPv4Network) or isinstance(net, ipaddress.IPv6Network):
+            ip = list(net.hosts())[0] if net.num_addresses > 1 else net.network_address
+        else:
+            ip = net.network_address
+        if max_ip is None or ip > max_ip:
+            max_ip = ip
+    return f"{max_ip + 1}/32"
 
 
 def add_user(config_name, comment):
