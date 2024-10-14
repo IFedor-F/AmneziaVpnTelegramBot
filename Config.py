@@ -44,7 +44,9 @@ class AWGConfig:
 
     def get_allowed_ips(self):
         self.parse_conf()
-        return [peer["AllowedIPs"] for peer in self.config if peer["section"] == "Peer"]
+        ips = [peer["AllowedIPs"] for peer in self.config if peer["section"] == "Peer"]
+        ips.extend([peer["Address"] for peer in self.config if peer["section"] == "Interface"])
+        return ips
 
 
 class Config:

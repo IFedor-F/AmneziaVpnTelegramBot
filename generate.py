@@ -20,7 +20,7 @@ def get_next_ip(config_name):
     ip_addresses = [ipaddress.ip_network(ip, strict=False).network_address
                     for ip in ConfigList[config_name].awg_config.get_allowed_ips()]
     if not ip_addresses:
-        return "192.168.12.1/32"
+        raise ValueError("No IP addresses configured")
     return f"{max(ip_addresses) + 1}/32"
 
 
